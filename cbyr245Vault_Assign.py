@@ -1,47 +1,32 @@
+import os
 import base64
-import json
-import hvac
 
-def init_server(client):
-    print("Initializing server and checking client authentication: {client.is_authenticated()}")
+def env_var():
+    os.environ["VAULT_ADDR"] = "https://127.0.0.1:8200"
+    os.environ["VAULT_TOKEN"] = ##"PASTE YOUR TOKEN HERE"
 
-def write_secret(client):
-    create_response = client.secrets.kv.v2.create_or_update_secret(path='hello', secret=dict(foo="bar"))
-    print(create_response)
+def intit_trans():
+    os.system("vault secrets enable transit")
 
-def read_secret(client):
-    read_responce = client.secrets.kv.v2.read_secret_version(path='hello')
-    print(read_response)
-    
-def create_key(client):
-    client.secrets.transit.create_key(name='my_python_key', key.type='aes256-gcm96')  
-                                                                                    
-def read_key(client):                                                                           
-    read_key_response = client.secrets.transit.read_key(name='my_python_key')
-    latest_version = read_key_response['data']['lastest_version']
-    print('Latest version for key "my_python_key" is: , {ver}'.format(ver=latest_version))
+def key():
+    k = "set_key"
+    os.system("vault write transit/keys/{} type=aes256-gcm96".format(k))
 
-def base64ify():  
+def enc_msg(plain_txt, key):
+    vault_dec = base64.b64encode(bytes(plain_txt, 'utf-8'))
+    os.system('vault write transit/encrypt/{} plaintext={}'.format(key, vault_dec.decode('utf-8')))
     return
-    
-def transit_encrypt(client, plain_text):
-    #text_bytes = plain_text.encode("utf-8")
-    #json_str = json.dumps(text_bytes.decode("utf-8"))
-    encrypt_data_response = client.secrets.transit.encrypt_data(name='my_phyton_key', plaintext=json_str.encode())
-    ciphertext = encrypt_data_response['data']['ciphertext']
-    print('Encrypted plaintext ciphertext is: {cipher}'.format(cipher=ciphertext))
 
-def transit_decrypt(client, ciphertext, decrypt_key="my.python_key"): 
-    decrypt_data_response = client.secrets.transit.decrypt_data(name=decrypt_key, ciphertext=ciphertext)
-    return str(base64.b64decode(decrypt_data_response['data']['plaintext']), "utf-8")
+def dec_msg(cipher, key):
+    os.system('vault write transit/decrypt/{} ciphertext={}'.format(key, cipher))
+    return
 
-                
- clt = hvac.Client(url='https://localhost:8200')
- init_server(clt)
- write_secret(clt)
- read_secret(clt)
- create_key(clt)
- read_key(clt)
- transit_encrypt(clt, "This is the plaintext to be encrypted")  
- transit_decrypt(clt, )               
 
+
+env_var()
+intit_trans()
+key()
+enc_msg("This is the plaintext being encrypted and decrypted!", "set_key")
+dec_msg(##'PASTE YOUR ENC TXT HERE' , "set_key")
+vault_plain = base64.b64decode(##'PASTE YOUR VAULT DEC TXT HERE')
+print(vault_plain.decode())
