@@ -1,13 +1,32 @@
 import os
-#allow secret transit
-os.system(vault secrets enable transit)
+import base64
 
-#Create key
-os.system(vault write transit/keys/mytestkey type=aes256-gcm96)
+def env_var():
+    os.environ["VAULT_ADDR"] = "https://127.0.0.1:8200"
+    os.environ["VAULT_TOKEN"] = ##"PASTE YOUR TOKEN HERE"
 
-#Encrypt data
-os.system(vault write transit/encrypt/k1 plaintext=$(base64 <<< "my very secret data"))
+def intit_trans():
+    os.system("vault secrets enable transit")
 
-#Decrypt data
-os.system(vault write transit/decrypt/k1 ciphertext=$(base24 <<< vault:v1:4bTFZAk3yi5U3hdaoTgDBPslIfWFZDO86a56NjbNLUrS4KTfdhE7nyqvSJL3DRiw) #Paige make sure this is the right ciphertext from the lab
+def key():
+    k = "set_key"
+    os.system("vault write transit/keys/{} type=aes256-gcm96".format(k))
 
+def enc_msg(plain_txt, key):
+    vault_dec = base64.b64encode(bytes(plain_txt, 'utf-8'))
+    os.system('vault write transit/encrypt/{} plaintext={}'.format(key, vault_dec.decode('utf-8')))
+    return
+
+def dec_msg(cipher, key):
+    os.system('vault write transit/decrypt/{} ciphertext={}'.format(key, cipher))
+    return
+
+
+
+env_var()
+intit_trans()
+key()
+enc_msg("This is the plaintext being encrypted and decrypted!", "set_key")
+dec_msg(##'PASTE YOUR ENC TXT HERE' , "set_key")
+vault_plain = base64.b64decode(##'PASTE YOUR VAULT DEC TXT HERE')
+print(vault_plain.decode())
