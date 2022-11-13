@@ -1,5 +1,5 @@
 def Key(filename, key):
-    filename=open('', 'r')
+    filename=open('#Enter html filename', 'r')
     key = list(key)
     if len(filename) == len(key):
         return(key)
@@ -10,8 +10,8 @@ def Key(filename, key):
     return("" . join(key))
      
 def Encrypt(filename, key):
-    filename= open('','r')
-    output_file= open('_copy.html', 'w')
+    filename= open('#Enter html filename','r')
+    output_file= open('#Enter html filename_copy.html', 'w')
     Enc_msg = []
     for i in range(len(filename)):
         x = (ord(filename[i]) +
@@ -22,7 +22,7 @@ def Encrypt(filename, key):
      
 
 def Deciph(output_file, key):
-    output_file= open('_copy.html', 'r')
+    output_file= open('#Enter html filename_copy.html', 'r')
     orig_text = []
     for i in range(len(output_file)):
         x = (ord(output_file[i]) -
